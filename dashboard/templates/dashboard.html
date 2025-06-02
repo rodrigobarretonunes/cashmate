@@ -1,0 +1,916 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashmate - Dashboard Financeiro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #0A2E36;
+            --secondary-color: #4E878C;
+            --accent-color: #14CC60;
+            --accent-light: #2BFF7E;
+            --expense-color: #FF6B6B;
+            --income-color: #51CF66;
+            --text-light: #F0FDF4;
+            --text-muted: #A8C7C0;
+            --background-gradient: linear-gradient(135deg, #0A2E36 0%, #164B4F 100%);
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-hover: rgba(255, 255, 255, 0.12);
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--background-gradient);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(10, 46, 54, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 2rem 1.5rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--accent-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--card-bg);
+            color: var(--accent-light);
+        }
+
+        .nav-link i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-color);
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            background: var(--card-hover);
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-income .card-value {
+            color: var(--income-color);
+        }
+
+        .card-expense .card-value {
+            color: var(--expense-color);
+        }
+
+        .card-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .positive {
+            color: var(--income-color);
+        }
+
+        .negative {
+            color: var(--expense-color);
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        select, input, button {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        select:focus, input:focus, button:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(20, 204, 96, 0.2);
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--accent-light);
+            transform: translateY(-2px);
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        /* Transactions */
+        .transactions {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .transaction-list {
+            list-style: none;
+        }
+
+        .transaction-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-category {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .category-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(20, 204, 96, 0.1);
+            color: var(--accent-color);
+        }
+
+        .category-info h4 {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .category-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .transaction-amount.income {
+            color: var(--income-color);
+            font-weight: 600;
+        }
+
+        .transaction-amount.expense {
+            color: var(--expense-color);
+            font-weight: 600;
+        }
+
+        .transaction-date {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .transaction-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        /* Add Transaction Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--primary-color);
+            border-radius: var(--border-radius-lg);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--text-light);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .radio-option {
+            flex: 1;
+        }
+
+        .radio-input {
+            display: none;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            background: var(--card-bg);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .radio-input:checked + .radio-label {
+            background: var(--accent-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .radio-input:checked + .income-option {
+            background: var(--income-color);
+        }
+
+        .radio-input:checked + .expense-option {
+            background: var(--expense-color);
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Responsividade */
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .transaction-item {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+            
+            .transaction-actions {
+                grid-column: span 2;
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .filters {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            select, input, button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-wallet"></i>
+                <span>Cashmate</span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-tags"></i>
+                        <span>Categorias</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Planejamento</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1 class="page-title">Dashboard Financeiro</h1>
+                <div class="user-profile">
+                    <img src="{% static 'avatars/default.png' %}" alt="Avatar" class="user-avatar">
+                    <span>Perfil Atual</span>
+                </div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="card card-balance">
+                    <p class="card-title">Saldo Atual</p>
+                    <p class="card-value">R$ 5.247,89</p>
+                    <p class="card-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>12% em relação ao mês passado</span>
+                    </p>
+                </div>
+                
+                <div class="card card-income">
+                    <p class="card-title">Receitas</p>
+                    <p class="card-value">R$ 8.520,00</p>
+                    <p class="card-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>8% em relação ao mês passado</span>
+                    </p>
+                </div>
+                
+                <div class="card card-expense">
+                    <p class="card-title">Despesas</p>
+                    <p class="card-value">R$ 3.272,11</p>
+                    <p class="card-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>5% em relação ao mês passado</span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filter-group">
+                    <span class="filter-label">Mês:</span>
+                    <select id="month-filter">
+                        <option value="all">Todos os meses</option>
+                        <option value="1">Janeiro</option>
+                        <option value="2">Fevereiro</option>
+                        <option value="3">Março</option>
+                        <option value="4" selected>Abril</option>
+                        <option value="5">Maio</option>
+                        <option value="6">Junho</option>
+                        <option value="7">Julho</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Setembro</option>
+                        <option value="10">Outubro</option>
+                        <option value="11">Novembro</option>
+                        <option value="12">Dezembro</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <span class="filter-label">Ano:</span>
+                    <select id="year-filter">
+                        <option value="2023">2023</option>
+                        <option value="2024" selected>2024</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <span class="filter-label">Categoria:</span>
+                    <select id="category-filter">
+                        <option value="all">Todas categorias</option>
+                        <option value="food">Alimentação</option>
+                        <option value="transport">Transporte</option>
+                        <option value="housing">Moradia</option>
+                        <option value="entertainment">Lazer</option>
+                        <option value="health">Saúde</option>
+                        <option value="education">Educação</option>
+                        <option value="other">Outros</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="add-transaction-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Adicionar Transação</span>
+                </button>
+            </div>
+            
+            <!-- Transactions List -->
+            <div class="transactions">
+                <div class="section-header">
+                    <h2 class="section-title">Transações Recentes</h2>
+                    <button class="btn btn-small">
+                        <i class="fas fa-download"></i>
+                        <span>Exportar</span>
+                    </button>
+                </div>
+                
+                <ul class="transaction-list">
+                    <!-- Exemplo de transação de receita -->
+                    <li class="transaction-item">
+                        <div class="transaction-category">
+                            <div class="category-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="category-info">
+                                <h4>Salário</h4>
+                                <p>Receita</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount income">+ R$ 4.500,00</div>
+                        <div class="transaction-date">05/04/2024</div>
+                        <div class="transaction-actions">
+                            <button class="action-btn" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                    
+                    <!-- Exemplo de transação de despesa -->
+                    <li class="transaction-item">
+                        <div class="transaction-category">
+                            <div class="category-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="category-info">
+                                <h4>Supermercado</h4>
+                                <p>Alimentação</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount expense">- R$ 487,35</div>
+                        <div class="transaction-date">03/04/2024</div>
+                        <div class="transaction-actions">
+                            <button class="action-btn" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                    
+                    <!-- Mais transações de exemplo -->
+                    <li class="transaction-item">
+                        <div class="transaction-category">
+                            <div class="category-icon">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="category-info">
+                                <h4>Combustível</h4>
+                                <p>Transporte</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount expense">- R$ 220,00</div>
+                        <div class="transaction-date">02/04/2024</div>
+                        <div class="transaction-actions">
+                            <button class="action-btn" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                    
+                    <li class="transaction-item">
+                        <div class="transaction-category">
+                            <div class="category-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <div class="category-info">
+                                <h4>Jantar fora</h4>
+                                <p>Lazer</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount expense">- R$ 135,50</div>
+                        <div class="transaction-date">01/04/2024</div>
+                        <div class="transaction-actions">
+                            <button class="action-btn" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                    
+                    <li class="transaction-item">
+                        <div class="transaction-category">
+                            <div class="category-icon">
+                                <i class="fas fa-freelancer"></i>
+                            </div>
+                            <div class="category-info">
+                                <h4>Freelance</h4>
+                                <p>Receita</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount income">+ R$ 1.200,00</div>
+                        <div class="transaction-date">30/03/2024</div>
+                        <div class="transaction-actions">
+                            <button class="action-btn" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Add Transaction Modal -->
+    <div class="modal-overlay" id="transaction-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Adicionar Transação</h3>
+                <button class="close-modal" id="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="transaction-form">
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="income" name="transaction-type" value="income" class="radio-input">
+                            <label for="income" class="radio-label income-option">
+                                <i class="fas fa-arrow-down"></i>
+                                Receita
+                            </label>
+                        </div>
+                        
+                        <div class="radio-option">
+                            <input type="radio" id="expense" name="transaction-type" value="expense" class="radio-input" checked>
+                            <label for="expense" class="radio-label expense-option">
+                                <i class="fas fa-arrow-up"></i>
+                                Despesa
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transaction-title" class="form-label">Título</label>
+                        <input type="text" id="transaction-title" class="form-control" placeholder="Ex: Salário, Supermercado, etc." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transaction-category" class="form-label">Categoria</label>
+                        <select id="transaction-category" class="form-control" required>
+                            <option value="" disabled selected>Selecione uma categoria</option>
+                            <optgroup label="Receitas">
+                                <option value="salary">Salário</option>
+                                <option value="freelance">Freelance</option>
+                                <option value="investment">Investimentos</option>
+                                <option value="other-income">Outras receitas</option>
+                            </optgroup>
+                            <optgroup label="Despesas">
+                                <option value="food">Alimentação</option>
+                                <option value="transport">Transporte</option>
+                                <option value="housing">Moradia</option>
+                                <option value="entertainment">Lazer</option>
+                                <option value="health">Saúde</option>
+                                <option value="education">Educação</option>
+                                <option value="other-expense">Outras despesas</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transaction-amount" class="form-label">Valor (R$)</label>
+                        <input type="number" id="transaction-amount" class="form-control" placeholder="0,00" min="0" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transaction-date" class="form-label">Data</label>
+                        <input type="date" id="transaction-date" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transaction-notes" class="form-label">Observações (opcional)</label>
+                        <textarea id="transaction-notes" class="form-control" rows="3" placeholder="Alguma observação sobre esta transação"></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-cancel" id="cancel-transaction">
+                    <i class="fas fa-times"></i>
+                    <span>Cancelar</span>
+                </button>
+                <button class="btn" id="save-transaction">
+                    <i class="fas fa-save"></i>
+                    <span>Salvar Transação</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Modal de transação
+        const transactionModal = document.getElementById('transaction-modal');
+        const addTransactionBtn = document.getElementById('add-transaction-btn');
+        const closeModalBtn = document.getElementById('close-modal');
+        const cancelTransactionBtn = document.getElementById('cancel-transaction');
+        
+        // Abrir modal
+        addTransactionBtn.addEventListener('click', () => {
+            transactionModal.classList.add('active');
+            // Definir data atual como padrão
+            document.getElementById('transaction-date').valueAsDate = new Date();
+        });
+        
+        // Fechar modal
+        function closeModal() {
+            transactionModal.classList.remove('active');
+        }
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelTransactionBtn.addEventListener('click', closeModal);
+        
+        // Fechar ao clicar fora do modal
+        transactionModal.addEventListener('click', (e) => {
+            if (e.target === transactionModal) {
+                closeModal();
+            }
+        });
+        
+        // Salvar transação
+        document.getElementById('save-transaction').addEventListener('click', () => {
+            // Aqui você adicionaria a lógica para salvar a transação
+            alert('Transação salva com sucesso!');
+            closeModal();
+            // Em uma aplicação real, você atualizaria a lista de transações aqui
+        });
+        
+        // Filtrar transações
+        document.getElementById('month-filter').addEventListener('change', filterTransactions);
+        document.getElementById('year-filter').addEventListener('change', filterTransactions);
+        document.getElementById('category-filter').addEventListener('change', filterTransactions);
+        
+        function filterTransactions() {
+            // Aqui você implementaria a lógica de filtragem
+            console.log('Filtrando transações...');
+            // Em uma aplicação real, você faria uma requisição AJAX ou filtraria os dados locais
+        }
+    </script>
+</body>
+</html>

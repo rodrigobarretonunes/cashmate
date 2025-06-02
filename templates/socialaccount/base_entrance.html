@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block head_title %}Cashmate{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Estilo base simples -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .background-card {
+            background-color: #ffffff;
+            padding: 0px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .content-card {
+            background-color: #111827;
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 24px;
+            color: #d1d5db;
+        }
+
+        button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 10px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        a {
+            display: none; /* Oculta os links azulzinhos */
+        }
+    </style>
+</head>
+<body>
+
+<div class="background-card">
+    <div class="content-card">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+</body>
+</html>
