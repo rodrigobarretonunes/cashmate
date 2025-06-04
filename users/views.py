@@ -5,53 +5,76 @@ from .models import Profiles
 
 
 
-#Renderiza pagina de perfis e responsavel pela logica de redirecionar pra rota de criação de perfil 
-def profile (request):
+
+# Returns all profiles associated with the currently logged-in user's account
+def get_user_profiles(request):
+    return Profiles.objects.filter(account_id_id = request.user.id)
+
+
+# Checks if the given username or email is already in use by another profile
+def is_duplicated_profile(username,email):
     context = {}
-    
-    if request.method == 'GET':
-        profiles = Profiles.objects.filter(account_id_id=request.user.id)
-        print("Perfis encontrados:", list(profiles.values('user', 'email', 'avatar','id')))
-        print("ID do usuário logado:", request.user.id)
+    user_exists = Profiles.objects.filter(user = username).exists()
+    email_exists = Profiles.objects.filter(email = email).exists()
+    if user_exists or email_exists:
+        if user_exists and email_exists:
+            context['error_message'] = 'Username and email are already in use.'
+            return True,context
+        elif user_exists:
+            context['error_message'] = 'Username is already in use.'
+            return True,context
+        else:
+            context['error_message'] = 'Email is already in use.'
+            return True,context
+    else:
+        return False, None
 
-        return render(request, 'profiles.html', {'profiles': profiles})
-        
+
+# Creates and saves a new profile linked to the given user account with username, email, and avatar
+def create_profile(user_obj, username, email, avatar):
+    profile = Profiles.objects.create(
+        account_id=user_obj,
+        user=username,
+        email=email,
+        avatar=avatar)
+    return profile
 
 
-       
-    elif request.method == 'POST':
-        user = request.POST.get('profile_name','').strip().upper()
+#fica responsavel por receber os dados do usuario quando for post e caso seja vazio retorna False
+def get_user_data(request):
+        username = request.POST.get('profile_name','').strip().upper()
         email = request.POST.get('profile_email','').strip().upper()
         avatar = request.POST.get('avatar_img','').strip()
-
-        user_exists = Profiles.objects.filter(user = user).exists()
-        email_exists = Profiles.objects.filter(email = email).exists()
-        empty_post = [user,email,avatar]
-        
-        if user_exists or email_exists:
-            if email_exists and user_exists:
-                context['error message'] = 'Username and email are already in use.'
-            elif email_exists:
-                context['error message'] = 'Username is already in use.'
-                    
-            else:
-                context['error message'] = 'Email is already in use.'
-            profiles = Profiles.objects.filter(account_id_id = request.user.id)
-            context['profiles'] = Profiles.objects.filter(account_id_id = request.user.id)
-            return render (request,'profiles.html',context)
-        
+        if username and email and avatar:
+            return username,email,avatar
         else:
-            profile = Profiles(account_id = request.user,user = user, email = email,avatar = avatar)
-            profile.save()
-            context['success_message'] = "Perfil criado com sucesso!"
-            context['profiles'] = Profiles.objects.filter(account_id_id = request.user.id)
-            return render (request,'profiles.html',context)
-
-
-
+            return None
         
 
 
+# Handles GET requests by retrieving all profiles for the logged-in user and rendering the profiles page
+def handle_get_request(request):
+    profiles = get_user_profiles(request)
+    return render(request,'profiles.html', {'profiles': profiles})
 
 
-        
+def handle_post_request(request):
+    context = {}
+    username,email,avatar = get_user_data(request)
+    verify_duplicated_profile, context['error_message'] =  is_duplicated_profile(username,email)
+    if verify_duplicated_profile:
+        return render (request,'profiles.html',context)
+
+    else:
+        create_profile(user_obj = request.user, username = username,email = email, avatar = avatar)
+        context['success_message'] = "Profile created successfully!"
+        context['profiles'] = get_user_profiles(request)
+        return render(request,'profiles.html',context)
+
+
+def profile(request):
+    if request.method == 'GET':
+     return handle_get_request(request)
+    elif request.method == 'POST':
+        return handle_post_request(request)
+    
