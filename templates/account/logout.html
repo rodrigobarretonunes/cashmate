@@ -1,25 +1,403 @@
-{% extends "account/base_manage.html" %}
-{% load allauth i18n %}
-{% block head_title %}
-    {% trans "Sign Out" %}
-{% endblock head_title %}
-{% block content %}
-    {% element h1 %}
-        {% trans "Sign Out" %}
-    {% endelement %}
-    {% element p %}
-        {% trans 'Are you sure you want to sign out?' %}
-    {% endelement %}
+
+    {% load allauth i18n static %}
+    {% block head_title %}
+    {% endblock head_title %}
+
+    {% block extra_head %}
+    <style>
+    /* Variáveis globais */
+    :root {
+        --clr-primary: #0A2E36;
+        --clr-secondary: #4E878C;
+        --clr-accent: #14CC60;
+        --clr-accent-light: #2BFF7E;
+        --clr-text: #F0FDF4;
+        --clr-text-muted: #A8C7C0;
+        --clr-bg-start: #0A2E36;
+        --clr-bg-end: #164B4F;
+
+        --radius: 24px;
+        --shadow-light: 0 4px 15px rgba(20, 204, 96, 0.2);
+        --shadow-heavy: 0 10px 40px rgba(20, 204, 96, 0.35);
+
+        --transition-fast: 0.25s ease-out;
+        --transition-smooth: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Reset base */
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        background: radial-gradient(circle at 10% 20%, var(--clr-bg-start) 0%, var(--clr-bg-end) 90%);
+        color: var(--clr-text);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Card logout com vidro translúcido */
+    .logout-card {
+        position: relative;
+        background: rgba(10, 46, 54, 0.75);
+        backdrop-filter: blur(18px) saturate(180%);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-heavy);
+        border: 1.5px solid rgba(255 255 255 / 0.15);
+        max-width: 460px;
+        width: 100%;
+        padding: 48px 40px 56px;
+        text-align: center;
+        color: var(--clr-text);
+        animation: fadeInUp 0.7s var(--transition-smooth) forwards;
+        opacity: 0;
+        transform: translateY(15px);
+        margin-bottom: 20px;
+    }
+
+    @keyframes fadeInUp {
+        to {
+        opacity: 1;
+        transform: translateY(0);
+        }
+    }
+
+    .logout-icon {
+        margin: 0 auto 28px;
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, var(--clr-accent-light), var(--clr-accent));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow:
+        0 0 12px var(--clr-accent-light),
+        0 0 28px var(--clr-accent-light);
+        transition: box-shadow var(--transition-fast);
+    }
+    .logout-icon svg {
+        width: 36px;
+        height: 36px;
+        stroke: white;
+        stroke-width: 2.4;
+    }
+    .logout-icon:hover {
+        box-shadow:
+        0 0 16px var(--clr-accent-light),
+        0 0 40px var(--clr-accent-light);
+    }
+
+    .logout-title {
+        font-weight: 900;
+        font-size: 2.4rem;
+        letter-spacing: 0.05em;
+        margin-bottom: 18px;
+        color: var(--clr-text);
+        text-shadow: 0 0 6px rgba(20, 204, 96, 0.8);
+    }
+
+    .logout-message {
+        font-size: 1.125rem;
+        line-height: 1.5;
+        margin-bottom: 36px;
+        color: var(--clr-text-muted);
+        padding: 0 12px;
+        user-select: none;
+    }
+
+    .logout-form {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 14px 28px;
+        font-weight: 700;
+        font-size: 1rem;
+        border-radius: var(--radius);
+        cursor: pointer;
+        border: none;
+        flex: 1 1 140px;
+        max-width: 180px;
+        transition: var(--transition-smooth);
+        box-shadow: var(--shadow-light);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+        position: relative;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--clr-accent), var(--clr-accent-light));
+        color: var(--clr-primary);
+        box-shadow:
+        0 8px 15px rgba(20, 204, 96, 0.3),
+        0 0 30px rgba(20, 204, 96, 0.25);
+    }
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+        background: linear-gradient(135deg, var(--clr-accent-light), var(--clr-accent));
+        box-shadow:
+        0 12px 24px rgba(20, 204, 96, 0.6),
+        0 0 48px rgba(20, 204, 96, 0.5);
+        transform: translateY(-3px) scale(1.05);
+        outline-offset: 4px;
+    }
+    .btn-primary:disabled {
+        background: var(--clr-accent);
+        cursor: not-allowed;
+        box-shadow: none;
+        opacity: 0.7;
+        transform: none;
+    }
+
+    .btn-secondary {
+        background: rgba(255 255 255 / 0.1);
+        color: var(--clr-text);
+        border: 1.8px solid rgba(255 255 255 / 0.18);
+        box-shadow: 0 0 12px rgba(255 255 255 / 0.08);
+    }
+    .btn-secondary:hover,
+    .btn-secondary:focus-visible {
+        background: rgba(255 255 255 / 0.18);
+        box-shadow: 0 0 18px rgba(255 255 255 / 0.25);
+        transform: translateY(-2px);
+        outline-offset: 4px;
+    }
+
+    a, a:hover, a:focus, a:visited {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .btn-primary.loading {
+        pointer-events: none;
+        color: var(--clr-primary);
+        background: transparent;
+        box-shadow: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+    }
+    .btn-primary.loading svg {
+        animation: spin 1.2s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 520px) {
+        .logout-card {
+        padding: 36px 24px 44px;
+        }
+        .logout-title {
+        font-size: 2rem;
+        }
+        .logout-message {
+        font-size: 1rem;
+        }
+        .logout-form {
+        flex-direction: column;
+        gap: 18px;
+        }
+        .btn {
+        max-width: 100%;
+        flex: none;
+        }
+    }
+
+    /* Floating menu - card estilo vidro */
+    .floating-menu-wrapper {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 2000;
+        font-family: 'Inter', sans-serif;
+        user-select: none;
+    }
+
+    .floating-menu-btn {
+        background: var(--clr-accent);
+        border: none;
+        color: var(--clr-primary);
+        font-size: 28px;
+        line-height: 1;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 6px 16px rgba(20,204,96,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .floating-menu-btn:hover,
+    .floating-menu-btn:focus {
+        background: var(--clr-accent-light);
+        outline: none;
+        box-shadow: 0 8px 24px rgba(20,255,110,0.9);
+    }
+
+    .floating-menu {
+        position: absolute;
+        top: 54px;
+        right: 0;
+        width: 220px;
+        background: rgba(10, 46, 54, 0.9);
+        backdrop-filter: blur(18px);
+        border-radius: 16px;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-12px);
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    }
+
+    .floating-menu.open {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .floating-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 8px 0;
+    }
+
+    .floating-menu li + li {
+        border-top: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .floating-menu a {
+        display: block;
+        padding: 14px 24px;
+        color: var(--clr-text);
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+        border-radius: 12px;
+    }
+
+    .floating-menu a:hover,
+    .floating-menu a:focus {
+        background: var(--clr-accent);
+        color: var(--clr-primary);
+        outline: none;
+    }
+    </style>
+    {% endblock extra_head %}
+
+    {% block content %}
+    <div class="logout-card" role="main" aria-labelledby="logout-title" aria-describedby="logout-desc">
+    <div class="logout-icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" aria-hidden="true" focusable="false">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+    </div>
+    
+    <h1 id="logout-title" class="logout-title">{% trans "Sign Out" %}</h1>
+    <p id="logout-desc" class="logout-message">{% trans 'Are you sure you want to sign out?' %}</p>
+    
     {% url 'account_logout' as action_url %}
-    {% element form method="post" action=action_url no_visible_fields=True %}
-        {% slot body %}
-            {% csrf_token %}
-            {{ redirect_field }}
-        {% endslot %}
-        {% slot actions %}
-            {% element button type="submit" %}
-                {% trans 'Sign Out' %}
-            {% endelement %}
-        {% endslot %}
-    {% endelement %}
-{% endblock content %}
+    <form method="post" action="{{ action_url }}" class="logout-form" novalidate>
+        {% csrf_token %}
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        
+        <button type="button" onclick="window.history.back()" class="btn btn-secondary" aria-label="{% trans 'Cancel sign out and go back' %}">
+        {% trans 'Cancel' %}
+        </button>
+
+        <button type="submit" class="btn btn-primary" id="logout-submit" aria-live="polite" aria-busy="false" aria-label="{% trans 'Confirm and sign out' %}">
+        {% trans 'Sign Out' %}
+        </button>
+    </form>
+    </div>
+
+    <!-- Floating menu button -->
+    <div class="floating-menu-wrapper" tabindex="0" aria-label="{% trans 'Account menu' %}">
+    <button class="floating-menu-btn" id="menuToggle" aria-haspopup="true" aria-expanded="false" aria-controls="floatingMenu" title="{% trans 'Open account menu' %}">
+        &#8942;
+    </button>
+    <nav id="floatingMenu" class="floating-menu" role="menu" aria-labelledby="menuToggle" tabindex="-1">
+        <ul>
+        <li><a href="{% url 'account_logout' %}" role="menuitem">{% trans 'Logout' %}</a></li>
+        <li><a href="{% url 'account_change_password' %}" role="menuitem">{% trans 'Change Password' %}</a></li>
+        <li><a href="{% url 'account_email' %}" role="menuitem">{% trans 'Manage Emails' %}</a></li>
+        <li><a href="{% url 'account_inactive' %}" role="menuitem">{% trans 'Deactivate Account' %}</a></li>
+        </ul>
+    </nav>
+    </div>
+
+    <script>
+    (function() {
+        const menuBtn = document.getElementById('menuToggle');
+        const menu = document.getElementById('floatingMenu');
+
+        function toggleMenu() {
+        const isOpen = menu.classList.toggle('open');
+        menuBtn.setAttribute('aria-expanded', isOpen);
+        if (isOpen) {
+            menu.focus();
+            // Close menu on outside click
+            document.addEventListener('click', outsideClickListener);
+            document.addEventListener('keydown', escKeyListener);
+        } else {
+            document.removeEventListener('click', outsideClickListener);
+            document.removeEventListener('keydown', escKeyListener);
+        }
+        }
+
+        function outsideClickListener(event) {
+        if (!menu.contains(event.target) && event.target !== menuBtn) {
+            closeMenu();
+        }
+        }
+
+        function escKeyListener(event) {
+        if (event.key === 'Escape') {
+            closeMenu();
+            menuBtn.focus();
+        }
+        }
+
+        function closeMenu() {
+        menu.classList.remove('open');
+        menuBtn.setAttribute('aria-expanded', false);
+        document.removeEventListener('click', outsideClickListener);
+        document.removeEventListener('keydown', escKeyListener);
+        }
+
+        menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMenu();
+        });
+
+        menu.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab' && !e.shiftKey && e.target === menu.lastElementChild.querySelector('a')) {
+            // Close menu when tabbing out from last menu item
+            closeMenu();
+        }
+        if (e.key === 'Tab' && e.shiftKey && e.target === menu.firstElementChild.querySelector('a')) {
+            // Close menu when shift+tabbing out from first menu item
+            closeMenu();
+        }
+        });
+    })();
+    </script>
+    {% endblock content %}
