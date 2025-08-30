@@ -17,4 +17,10 @@ class TransactionCreate(TransactionBase):
     pass
 
 class TransactionRead(TransactionBase):
+    id:int
+
+
+class Config:
+    orm_mode = True
+
     
