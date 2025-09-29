@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr 
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List         
 from datetime import datetime 
 
@@ -9,8 +9,8 @@ from datetime import datetime
 
 class UserCreate(BaseModel):
     email: EmailStr
-    username: str
-    password: str
+    username: str = Field(..., min_length=3, max_length=50)
+    password: str = Field(..., min_length=6)
 
 
 class UserRead(BaseModel):
@@ -21,7 +21,7 @@ class UserRead(BaseModel):
     created_at:datetime
     
     class Config:
-        orm_mode=True
+        from_attributes=True
     
 
 class UserLogin(BaseModel):
@@ -34,7 +34,7 @@ class UserToken(BaseModel):
    token_type:str
 
    class Config:
-        orm_mode=True
+        from_attributes=True
 
 
 # -----------------------------
@@ -42,21 +42,21 @@ class UserToken(BaseModel):
 # -----------------------------
 
 class TransactionCreate(BaseModel):
-    description = str
-    type = str
-    amount = float
+    description : str
+    type : str
+    amount : float
 
 class TransactionRead(BaseModel):
-    id = int
-    user_id = int
-    amount = float
-    type = str
-    category = Optional[str] = None
+    id : int
+    user_id : int
+    amount : float
+    type : str
+    category : Optional[str] = None
     description: str
-    created_at = datetime
+    created_at : datetime
     
     class Config:
-        orm_mode=True
+        from_attributes:True
 
 
 # -----------------------------
