@@ -7,7 +7,9 @@ import jwt
 from datetime import datetime, timedelta,timezone
 from dotenv import load_dotenv
 import os 
-from fastapi import HTTPException
+from fastapi import HTTPException,status
+from jose import JWTError, jwt, ExpiredSignatureError
+
 
 
 load_dotenv()
@@ -42,13 +44,33 @@ def get_token(data:dict):
     except Exception as e:
         print(e)
         raise HTTPException(status_code=400, detail="Erro ao gerar o token")
-    
-
 
 
 
 def verify_token(token: str):
-    ...
+    secret_key = os.getenv("SECRET_KEY")
+    algorithm = os.getenv("ALGORITHM")
+
+    try:
+        payload = jwt.decode(token,secret_key,algorithms=[algorithm])
+        user_id = payload["user_id"]
+        username = payload["username"]
+        if not user_id or not username:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido ou expirado")
+        return payload
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expirado")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token Invalido")
+
+    
+        
+        
+        
+
+
+
+    
 
 #Função que verifica se o usuario existe no banco de dados 
 def verify_if_user_exists(db:Session,username:str):
