@@ -12,6 +12,10 @@ class UserCreate(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     password: str = Field(..., min_length=6)
 
+class UserLogin(BaseModel):
+    username: str = Field(..., min_length=3, max_length=50)
+    password: str = Field(..., min_length=6)
+
 
 class UserRead(BaseModel):
     id:int
@@ -32,6 +36,7 @@ class UserLogin(BaseModel):
 class UserToken(BaseModel):
    access_token:str
    token_type:str
+   msg:str
 
    class Config:
         from_attributes=True
