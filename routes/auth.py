@@ -40,8 +40,6 @@ async def login(user:schemas.UserLogin,db:Session=Depends(get_db)):
         else:
             raise HTTPException(status_code=400, detail="Username não encontrado, tente novamente!")
 
-
-
     except Exception as e:
         print(e)
         raise HTTPException(status_code=400, detail="Houve um problem com o seu login, recarregue a pagina e tente novamente.")

@@ -49,16 +49,35 @@ class UserToken(BaseModel):
 class TransactionCreate(BaseModel):
     description : str
     type : str
-    amount : float
+    owner_amount : float
+    category : Optional[str] = None
+    is_shared : Optional[bool] = False
+    counterparty_username: Optional[int] = None
+    counterparty_ratio : Optional[float] = None
+    counterparty_amount : Optional[float] = None
+    owner_ratio : Optional[float] = None
+    is_recurring : Optional[bool] = False
+    end_date : Optional[datetime] = None
+    accepted_by_counterparty : Optional[bool] = False
+    expiration_time : Optional[datetime] = None
+
 
 class TransactionRead(BaseModel):
     id : int
     user_id : int
-    amount : float
+    owner_amount : float
     type : str
     category : Optional[str] = None
     description: str
     created_at : datetime
+    is_shared : Optional[bool] = False
+    counterparty_username : Optional[int] = None
+    counterparty_ratio : Optional[float] = None
+    counterparty_amount : Optional[float] = None
+    owner_ratio : Optional[float] = None
+    is_recurring : Optional[bool] = False
+    end_date : Optional[datetime] = None
+    
     
     class Config:
         from_attributes:True
