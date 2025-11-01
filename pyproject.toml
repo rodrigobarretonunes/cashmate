@@ -1,0 +1,15 @@
+[project]
+name = "cashmate"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi-users>=15.0.1",
+    "fastapi[standard]>=0.120.4",
+    "passlib[bcrypt]>=1.7.4",
+    "pydantic>=2.12.3",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.20",
+    "sqlalchemy>=2.0.44",
+]
