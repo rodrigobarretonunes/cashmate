@@ -1,28 +1,23 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, DateTime, func
 from sqlalchemy.orm import DeclarativeBase, relationship
-
-# Base do SQLAlchemy
-class Base(DeclarativeBase):
-    pass
+from datetime import datetime, timezone 
+from database import Base
 
 
 # ========================
 #       USERS
 # ========================
 class User(Base):
-    __tablename__ = "users"
-
+    __tablename__ = "users_table"
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True, nullable=False) # Nome de usuário
-    email = Column(String, unique=True, index=True, nullable=True, default = None)    # Email do usuário
-    hashed_password = Column(String, nullable=False)  # Senha criptografada
-    balance = Column(Float, default=0.0, nullable=False)  # Saldo total atual do usuário
-    is_active = Column(Boolean, default=True, nullable=False)  # Se o usuário está ativo
-    is_superuser = Column(Boolean, default=False, nullable=False)  # Permissão administrativa
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)  # Data de criação
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())  # Atualizado automaticamente
-
-    # Relação com transações
+    email =  Column(String, unique=True, nullable=False,index=True)
+    username = Column(String, unique=True,nullable=False,index=True)
+    hashed_password = Column(String, nullable=True)
+    balance = Column(Float,default=0.0)
+    is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     transactions = relationship("Transaction", back_populates="user")
 
 
@@ -34,7 +29,7 @@ class Transaction(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)  # Relacionamento com o usuário
+    user_id = Column(Integer, ForeignKey("users_table.id"), nullable=False)  # Relacionamento com o usuário
 
     owner_amount = Column(Float, nullable=False)  # Valor da transação
     type = Column(String, nullable=False)  # 'income' (entrada) ou 'expense' (saída)
@@ -46,7 +41,8 @@ class Transaction(Base):
     is_recurring = Column(Boolean, default=False, nullable=False)  # Se é uma despesa/receita recorrente
     end_date = Column(DateTime(timezone=True), nullable=True)  # Caso tenha data de término (para transações recorrentes)
 
-    counterparty_username = Column(String, ForeignKey("users.username"), nullable=True)  #
+    counterparty_username = Column(String, nullable=True)
+    counterparty_id = Column(Integer, nullable=True)
     is_shared = Column(Boolean, default=False, nullable=False)  # Se a transação é compartilhada com alguém
     counterparty = Column(String, nullable=True)  # Pessoa com quem compartilha (ex: 'Maria')
     counterparty_ratio = Column(Float, nullable=True)  # Percentual da divisão (ex: 50%)
