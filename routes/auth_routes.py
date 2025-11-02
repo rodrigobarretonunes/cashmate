@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from crud import get_password_hash, create_user, verify_password, verify_if_user_exists
+from crud import get_password_hash, create_user, verify_password, verify_if_user_exists, login_user
 from schemas import UserCreate, UserLogin, UserRead
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
@@ -29,7 +29,7 @@ async def register_user(user:UserCreate, db: Session=Depends(get_db)):
 
 
 # Endpoint to login a user 
-
-
-
-    
+@router.post("login")
+async def login_user_endpoint(user:UserLogin, db: Session=Depends(get_db)):
+    token = await login_user(db,user)
+    return token
