@@ -12,4 +12,10 @@ dependencies = [
     "python-jose[cryptography]>=3.5.0",
     "python-multipart>=0.0.20",
     "sqlalchemy>=2.0.44",
+    "taskipy>=1.14.1",
 ]
+
+[tool.taskipy.tasks]
+run = "task backend & task frontend"
+backend = "python main.py"
+frontend = "cd './Front Cashmate' && npm run dev"

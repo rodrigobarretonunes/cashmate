@@ -5,11 +5,6 @@ from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
 from database import get_db 
 
-
-
-
-
-
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
@@ -29,7 +24,8 @@ async def register_user(user:UserCreate, db: Session=Depends(get_db)):
 
 
 # Endpoint to login a user 
-@router.post("login")
+@router.post("/login")
 async def login_user_endpoint(user:UserLogin, db: Session=Depends(get_db)):
     token = await login_user(db,user)
-    return token
+    return {"access_token": token, "token_type": "bearer"}
+
