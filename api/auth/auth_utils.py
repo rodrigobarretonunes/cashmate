@@ -1,36 +1,36 @@
-from jose import JWTError, jwt
-from fastapi import HTTPException, status, Depends, Request
-from models import User
-from datetime import datetime, timezone, timedelta
+from datetime import datetime,timedelta,timezone
 from passlib.context import CryptContext
+from api.auth.auth_models import User
 import os 
 import dotenv
-from schemas import TokenResponse
+from fastapi import HTTPException,Request,status
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from database import get_db
-from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+
 
 
 
 dotenv.load_dotenv()
+
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
-# Password hashing context
-pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+
+
 
 # Function to hash a password
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 def get_password_hash(password: str):
     hashed_password = pwd_context.hash(password)
     return hashed_password
 
-
 # Function to verify a password
 def verify_password(plain_password:str, hashed_password:str):
     return pwd_context.verify(plain_password, hashed_password)
+
 
 
 # Function to create access token
@@ -90,5 +90,3 @@ def get_current_user(request:Request, db:Session):
         return user
     except JWTError:
         raise HTTPException(status_code=401, detail="Token decode error")
-
-

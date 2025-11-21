@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import auth_routes, transaction_routes
-from database import init_db
+from api.auth import auth_routes
+from api.wallet import wallet_routes
+from core.database import init_db
 
 app = FastAPI()
 init_db()
@@ -22,5 +23,5 @@ app.add_middleware(
 
 # Inclui as rotas de autenticação
 app.include_router(auth_routes.router)
-app.include_router(transaction_routes.router)
+app.include_router(wallet_routes.router)
 
