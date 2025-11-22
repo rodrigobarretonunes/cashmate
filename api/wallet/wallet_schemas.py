@@ -1,22 +1,18 @@
-from pydantic import BaseModel, Field, EmailStr
-from typing import Optional, List         
+from pydantic import BaseModel
+from typing import Optional        
 from datetime import datetime 
 
 
 class TransactionCreate(BaseModel):
+    user_id: int
     owner_amount: float
     type: str  # 'income' ou 'expense'
+    created_at: datetime
     description: Optional[str] = None
     category: Optional[str] = None
     is_recurring: Optional[bool] = False
     end_date: Optional[datetime] = None
-    counterparty_username: Optional[str] = None
-    counterparty_id: Optional[int] = None
-    is_shared: Optional[bool] = False
-    counterparty: Optional[str] = None
-    counterparty_ratio: Optional[float] = None
-    counterparty_amount: Optional[float] = None
-    expiration_time: Optional[datetime] = None
+
 
 
 
@@ -25,22 +21,25 @@ class TransactionRead(BaseModel):
     id: int
     user_id: int
     owner_amount: float
-    type: str
+    type:str
     created_at: datetime
     description: Optional[str] = None
     category: Optional[str] = None
     is_recurring: bool
-    end_date: Optional[datetime] = None
-    counterparty_username: Optional[str] = None
-    counterparty_id: Optional[int] = None
-    is_shared: bool
-    counterparty: Optional[str] = None
-    counterparty_ratio: Optional[float] = None
-    counterparty_amount: Optional[float] = None
-    accepted_by_counterparty: bool
-    expiration_time: Optional[datetime] = None
-
+    end_date: Optional [datetime] = None
     model_config = {"from_attributes": True}
+
+# Schema para atualização de transações
+
+class TransactionUpdate(BaseModel):
+    owner_amout : Optional[float] = None
+    type: Optional[str] = None
+    description: Optional[str] = None
+    category: Optional [str] = None
+    is_recurring: Optional[bool] = None
+    end_date: Optional[datetime] = None
+    model_config = {"from_attributes": True}
+
 
 
 

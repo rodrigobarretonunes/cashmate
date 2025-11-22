@@ -1,9 +1,11 @@
 from fastapi import APIRouter
-from .auth_crud import get_password_hash, create_user, verify_password, verify_if_user_exists, login_user
 from .auth_schemas import UserCreate, UserLogin, UserRead
+from .auth_crud import create_user, login_user, verify_if_user_exists
+from .auth_utils import get_current_user
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
 from core.database import get_db 
+from core.security import get_password_hash
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

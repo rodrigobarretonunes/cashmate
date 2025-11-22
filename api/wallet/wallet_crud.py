@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from api.auth.auth_models import Transaction
+from .wallet_models import Transaction
 from fastapi import HTTPException
 
 
-def query_all_transactions(db: Session):
+async def query_all_transactions(db: Session):
     try:
         stmt = select(Transaction)
         user_transactions = db.execute(stmt).scalars().all()
@@ -12,7 +12,7 @@ def query_all_transactions(db: Session):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-def query_transaction_by_id(db: Session, transaction_id: int):
+async def query_transaction_by_id(db: Session, transaction_id: int):
     try:
         stmt = select(Transaction).where(Transaction.id == transaction_id)
         selected_transaction = db.execute(stmt).scalars().first()
@@ -20,7 +20,7 @@ def query_transaction_by_id(db: Session, transaction_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-def create_transaction(db,new_transaction,user_id:int):
+async def create_transaction(db,new_transaction,user_id:int):
     try:
         db_transaction = Transaction(
             user_id=user_id,
@@ -47,7 +47,7 @@ def create_transaction(db,new_transaction,user_id:int):
         error_detail = f"Error creating transaction: {str(e)} | {traceback.format_exc()}"
         raise HTTPException(status_code=500, detail=error_detail)
 
-def update_transaction(db:Session, db_transaction:Transaction, updated_transaction:Transaction):
+async def update_transaction(db:Session, db_transaction:Transaction, updated_transaction:Transaction):
     try:
         for var,value in vars(updated_transaction).items():
             setattr(db_transaction, var, value) if value else None
@@ -57,7 +57,7 @@ def update_transaction(db:Session, db_transaction:Transaction, updated_transacti
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)+"Something went wrong when editing transaction")
 
-def delete_transaction(db:Session, transaction_id:int):
+async def delete_transaction(db:Session, transaction_id:int):
     try:
         selected_transaction = query_transaction_by_id(db,transaction_id)
         if not selected_transaction:

@@ -1,9 +1,9 @@
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from api.auth.auth_models import User
-from api.auth.auth_utils import get_password_hash, verify_password,create_access_token
-from api.auth.auth_schemas import UserCreate, UserLogin
+from .auth_schemas import UserCreate, UserLogin
+from .auth_models import User
+from core import verify_password,create_access_token
 from fastapi import HTTPException
 
 
@@ -31,7 +31,7 @@ async def login_user(db: Session, user:UserLogin):
         db_user = authenticate_user(db,user)
         if not db_user:
             raise HTTPException(status_code=400, detail='Invalid credentials, (login_user)')
-        token = create_access_token(db_user)
+        token = create_access_token(user_id=db_user.id,username=db_user.username,email=db_user.email)
         return token
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,5 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
-from typing import Optional, List         
+from pydantic import BaseModel, Field, EmailStr        
 from datetime import datetime 
 
 class UserCreate(BaseModel):
@@ -21,11 +20,3 @@ class UserRead(BaseModel):
     
     model_config = {"from_attributes": True}
 
-class TokenValidation(BaseModel):
-    token: str
-
-    
-class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-    message: Optional[str] = "Login Successful"
